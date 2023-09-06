@@ -1,0 +1,7 @@
+### Create a new user
+POST http://localhost:3000/
+content-type: application/json
+
+{
+  "text": "test fastly a text without adverbs"
+}
