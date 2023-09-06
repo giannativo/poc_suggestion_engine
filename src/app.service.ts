@@ -16,7 +16,6 @@ export class AppService {
         any: [
           {
             fact: "word",
-            path: '$.*',
             operator: "wordEndsWith",
             value: "ly"
           }
@@ -30,24 +29,36 @@ export class AppService {
       }
     };
     this.engine.addRule(adverbRule);
-    this.engine.addOperator('wordEndsWith', (factValue: string[], jsonValue: string) => {
+    this.engine.addOperator('wordEndsWith', (factValue: string, jsonValue: string) => {
       const pattern = new RegExp(`${jsonValue}$`);
-      const results = factValue.map((word) => pattern.test(word));
-      return results[0];
+      return pattern.test(factValue);
     })
   }
 
-  async findGrammarSuggestions(text: string): Promise<any[]> {
-    let suggestions = [];
-    const facts = { word: text.split(/\s+/) };
-    try {
-      const results = await this.engine.run(facts);
-      suggestions = results.events.filter(event => event.type === "adverb_error")
-      .map(event => event.params.message);
-    }
-    catch (err) {
-      console.error(err);
-      suggestions = [];
+  async findGrammarSuggestions(text: string): Promise<Object> {
+    let suggestions = {
+      "originalText": text,
+      "errors": []
+    };
+    const words = text.split(/\s+/);
+    let facts = { word: text.split(/\s+/) };
+    for (let word of words) {
+      try {
+        let facts = { word: word };
+        let results = await this.engine.run(facts);
+        let errorMessages = results.events.filter(event => event.type === "adverb_error")
+        .map(event => event.params.message);
+        if (errorMessages.length) {
+          suggestions.errors.push({
+            wordChecked: word,
+            messages: errorMessages
+          })          
+        }       
+      }
+      catch (err) {
+        console.error(err);
+        return {};
+      }
     }
     return suggestions;
   }

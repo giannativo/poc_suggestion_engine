@@ -7,7 +7,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post()
-  async getHello(@Body() body: SendTextDto): Promise<any[]> {
+  async getHello(@Body() body: SendTextDto): Promise<Object> {
     return await this.appService.findGrammarSuggestions(body.text);
   }
 }
