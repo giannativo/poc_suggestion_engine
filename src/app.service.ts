@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Engine } from "json-rules-engine";
+import { stripHtml } from 'string-strip-html';
 
 @Injectable()
 export class AppService {
@@ -36,12 +37,12 @@ export class AppService {
   }
 
   async findGrammarSuggestions(text: string): Promise<Object> {
+    let plainText = this.convertHtmlToPlainText(text);
     let suggestions = {
       "originalText": text,
       "errors": []
     };
     const words = text.split(/\s+/);
-    let facts = { word: text.split(/\s+/) };
     for (let word of words) {
       try {
         let facts = { word: word };
@@ -61,5 +62,9 @@ export class AppService {
       }
     }
     return suggestions;
+  }
+
+  convertHtmlToPlainText(htmlText: string): string {
+    return stripHtml(htmlText).result;
   }
 }

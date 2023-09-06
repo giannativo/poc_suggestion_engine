@@ -3,5 +3,5 @@ POST http://localhost:3000/
 content-type: application/json
 
 {
-  "text": "test fastly and quickly a text without adverbs"
+  "text": "test fastly and text without adverbs"
 }
